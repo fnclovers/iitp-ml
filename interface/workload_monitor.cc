@@ -25,15 +25,14 @@ void WorkloadMonitor::enqueueNewRequest(bool isRead, uint64_t tag, LPN slpn,
                                         uint32_t nlp) {
   uint64_t now = getTick();
 
+  UNUSED(isRead);
+
+  auto ret = window.emplace(tag, WindowEntry(slpn, nlp, now - lastRequestTime));
+
   // Note that enqueueNewRequest can be called on filling phase
   lastRequestTime = now;
   lastRead = tag;
 
-  if (!isRead) {
-    return;
-  }
-
-  auto ret = window.emplace(tag, WindowEntry(slpn, nlp, now));
   if (!ret.second) {
     abort();
   }
