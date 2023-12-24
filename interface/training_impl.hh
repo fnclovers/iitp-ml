@@ -16,7 +16,7 @@ class AbstractTrainig : public Object {
   CoReadPredictor *pp;
 
  public:
-  AbstractTrainig(ObjectData &o);
+  AbstractTrainig(ObjectData &o) : Object(o) {}
   virtual ~AbstractTrainig() = default;
 
   virtual void init(CoReadPredictor *pp, uint64_t totalLogicalPages) {
@@ -24,7 +24,7 @@ class AbstractTrainig : public Object {
     this->totalLogicalPages = totalLogicalPages;
   }
   virtual void add(WindowEntry &) = 0;
-  virtual bool get(LPN, CoReadPrediction) = 0;
+  virtual bool get(LPN, CoReadPrediction &) = 0;
 
   void getStatList(std::vector<Stat> &, std::string) noexcept override {}
   void getStatValues(std::vector<double> &) noexcept override {}
@@ -41,7 +41,7 @@ class MLPTrainig : public AbstractTrainig {
   ~MLPTrainig();
 
   void add(WindowEntry &) override;
-  bool get(LPN, CoReadPrediction) override;
+  bool get(LPN, CoReadPrediction &) override;
 
   void getStatList(std::vector<Stat> &, std::string) noexcept override {}
   void getStatValues(std::vector<double> &) noexcept override {}
