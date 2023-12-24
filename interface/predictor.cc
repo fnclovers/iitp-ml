@@ -1,7 +1,8 @@
 #include "ftl/ml-prediction/interface/predictor.hh"
 
-#include "ftl/ml-prediction/interface/ml_model.hh"
 #include "ftl/ml-prediction/interface/predictor_impl.hh"
+#include "ftl/ml-prediction/interface/training_impl.hh"
+#include "ftl/ml-prediction/interface/workload_monitor.hh"
 #include "sim/object.hh"
 
 namespace SimpleSSD::ML {
@@ -27,52 +28,9 @@ void MLObject::panic_log(const char *format, T... args) noexcept {
 
 CoReadPredictor::CoReadPredictor(ObjectData *po)
     : MLObject(po), predictionCnt(0) {
-  const uint8_t modelMode = po->config->readUint(
-      SimpleSSD::Section::Simulation, SimpleSSD::Config::Key::MLModel);
-
-  switch (modelMode) {
-    case 0:
-      pModel = new FileModel(*po);
-      break;
-
-    case 1:
-      pModel = new FileMLModel(*po);
-      break;
-
-    default:
-      pModel = nullptr;
-      panic_log("invalid model");
-      break;
-  }
-
-  const uint8_t historyTableMode = po->config->readUint(
-      SimpleSSD::Section::Simulation, SimpleSSD::Config::Key::MLTable);
-  const uint64_t numEntry = po->config->readUint(
-      SimpleSSD::Section::Simulation, SimpleSSD::Config::Key::MLNumTableEntry);
-
-  switch (historyTableMode) {
-    case 0:
-      pTable = new NoopHistoryTable(*po);
-      break;
-    case 1:
-      pTable = new SpaceSavingHistoryTable(*po, numEntry);
-      break;
-    case 2:
-      pTable = new LRUHistoryTable(*po, numEntry);
-      break;
-    case 3:
-      pTable = new AccurateWritePredict(*po, numEntry);
-      break;
-    default:
-      pTable = nullptr;
-      panic_log("invalid history model");
-      break;
-  }
-
+  pModel = new FileModel(*po);
+  pTable = new MLPTrainig(*po);
   pMonitor = new WorkloadMonitor(*po);
-
-  predMode = (Config::MLPredictionType)po->config->readUint(
-      Section::Simulation, Config::Key::MLPredictionMode);
 
   resetStatValues();
 }
@@ -123,24 +81,6 @@ bool CoReadPredictor::tryGetPrediction(uint64_t tag,
     debugprint("get prediction fail tag %" PRIu64, tag);
     return false;
   }
-}
-
-void CoReadPredictor::directPrediction(LPN lpn, uint32_t &intraLeft,
-                                       uint32_t &intraRight) {
-  pModel->directPrediction(lpn, intraLeft, intraRight);
-}
-
-bool CoReadPredictor::direct_get(LPN lpn, std::vector<LPN> &history, int idx) {
-  return pTable->direct_get(lpn, history, idx);
-}
-
-bool CoReadPredictor::curr_read_predict(LPN lpn, std::vector<LPN> &history,
-                                        int idx) {
-  return pTable->curr_read_predict(lpn, history, idx);
-}
-
-void CoReadPredictor::update(LPN lpn, uint32_t nlp, bool isRead) {
-  pTable->update(lpn, nlp, isRead);
 }
 
 void CoReadPredictor::enqueueNewRequest(bool isRead, uint64_t tag, LPN slpn,

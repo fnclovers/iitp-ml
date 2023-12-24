@@ -37,7 +37,7 @@ class AbstractTrainig : public Object {
 class MLPTrainig : public AbstractTrainig {
  private:
  public:
-  MLPTrainig(ObjectData &o, uint64_t numEntry);
+  MLPTrainig(ObjectData &o);
   ~MLPTrainig();
 
   void add(WindowEntry &) override;

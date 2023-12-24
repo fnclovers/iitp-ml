@@ -3,6 +3,7 @@
 #ifndef __SIM_CO_READ_PREDICTOR_HH__
 #define __SIM_CO_READ_PREDICTOR_HH__
 
+#include "ftl/predictor_interface.hh"
 #include "sim/log.hh"
 
 namespace SimpleSSD {
