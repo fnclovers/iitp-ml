@@ -28,7 +28,7 @@ void MLObject::panic_log(const char *format, T... args) noexcept {
 
 CoReadPredictor::CoReadPredictor(ObjectData *po)
     : MLObject(po), predictionCnt(0) {
-  pModel = new FileModel(*po);
+  pModel = new MLPModel(*po);
   pTable = new MLPTrainig(*po);
   pMonitor = new WorkloadMonitor(*po);
 
