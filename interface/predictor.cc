@@ -1,5 +1,6 @@
 #include "ftl/ml-prediction/interface/predictor.hh"
 
+#include "ftl/ml-prediction/interface/mlp_model.hh"
 #include "ftl/ml-prediction/interface/predictor_impl.hh"
 #include "ftl/ml-prediction/interface/training_impl.hh"
 #include "ftl/ml-prediction/interface/workload_monitor.hh"

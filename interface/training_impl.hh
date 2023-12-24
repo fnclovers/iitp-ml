@@ -8,6 +8,12 @@
 #include "sim/object.hh"
 #include "sim/types.hh"
 
+namespace torch {
+namespace optim {
+class Optimizer;
+}
+}  // namespace torch
+
 namespace SimpleSSD::ML {
 
 class AbstractTrainig : public Object {
@@ -34,8 +40,13 @@ class AbstractTrainig : public Object {
   void restoreCheckpoint(std::istream &) noexcept override {}
 };
 
+class MLPModel;
+
 class MLPTrainig : public AbstractTrainig {
  private:
+  MLPModel *model;
+  ::torch::optim::Optimizer *optimizer;
+
  public:
   MLPTrainig(ObjectData &o);
   ~MLPTrainig();
