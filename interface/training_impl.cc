@@ -32,11 +32,10 @@ struct MLPModel : ::torch::nn::Module {
 
 // Training class
 
-MLPTrainig::MLPTrainig(ObjectData &o)
-    : AbstractTrainig(o),
-      optimizer(new ::torch::optim::Adam(model->parameters(),
-                                         ::torch::optim::AdamOptions(0.001))) {
+MLPTrainig::MLPTrainig(ObjectData &o) : AbstractTrainig(o) {
   model = new MLPModel();
+  optimizer = new ::torch::optim::Adam(model->parameters(),
+                                       ::torch::optim::AdamOptions(0.001));
 }
 
 MLPTrainig::~MLPTrainig() {
